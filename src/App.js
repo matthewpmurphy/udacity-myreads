@@ -22,42 +22,29 @@ class BooksApp extends Component {
   *  Notificatino object
   */
   _notifcationSystem: null;
-
+  
   /**
-   * @description Display a successful notification message
-   * @param { string } message
-   */
-  successNotfication = (message) => {
-    this._notificationSystem.addNotification({
-      message: message,
-      title: 'Success!',
-      level: 'success',
-      position: 'tc',
-      dismissable: true
-    });
-  }
-
-  /**
-   * @description Display an unsuccessful notification message
-   * @param { string } message
-   */
-  errorNotification = (message) => {
-    this._notificationSystem.addNotification({
-      message: message,
-      title: 'Success!',
-      level: 'error',
-      position: 'tc',
-      dismissable: true
-    });
-  }
-
-  /**
-   * @description Displays the successNofication or errorNotification
-   * @param { bool } success
-   * @param { string } message
+   * @description Displays the success or error message based on the bool parameter passed
+   * @param { bool } success -  if the message is a success message or not
+   * @param { string } message - actual message to display
+   * @return displays a notification message
    */
   notificationStatus = (success, message) => {
-    success ? this.successNotfication(message) : this.errorNotification(message)
+    var messageLevel = 'error';
+    var title =  'Oops!';
+
+    if(success) {
+      messageLevel = 'success';
+      title = 'Success!';
+    }
+
+    this._notificationSystem.addNotification({
+      message: message,
+      title: title,
+      level: messageLevel,
+      position: 'tc',
+      dismissable: true
+    });
   }
 
   /**
