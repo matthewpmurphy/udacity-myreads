@@ -22,7 +22,7 @@ class BooksApp extends Component {
   *  Notificatino object
   */
   _notifcationSystem: null;
-  
+
   /**
    * @description Displays the success or error message based on the bool parameter passed
    * @param { bool } success -  if the message is a success message or not
@@ -100,7 +100,7 @@ class BooksApp extends Component {
                   id={book.id}
                   title={book.title}
                   authors={this.listAuthors(book.authors)}
-                  coverImageUrl={book.imageLinks.thumbnail}
+                  coverImageUrl={this.checkForImage(book.imageLinks)}
                   shelf={book.shelf}
                   availableShelves={this.state.shelves}
                   update={this.updateBookStatus}
@@ -111,6 +111,20 @@ class BooksApp extends Component {
         }
       </ol>
       )
+    }
+  }
+
+  /**
+   * @description Check to see if image object exists
+   * @param { Object } images - image object passed from the book object
+   * @return if images object exists return the thumbnail, if not return not found image
+   */
+  checkForImage = (images) => {
+    if(typeof images !== 'undefined') {
+      return images.thumbnail
+    }
+    else {
+      return '/img/no-image-found.jpg'
     }
   }
 
