@@ -7,6 +7,7 @@ class Book extends Component {
      * @return returns the setup for a book based on properties passed into it
      */
     render() {
+        var thumbnail = (this.props.book.imageLinks) ? this.props.book.imageLinks.thumbnail : '/img/no-image-found.jpg';
         return (
             <div className="book">
                 <div className="book-top">
@@ -15,14 +16,29 @@ class Book extends Component {
                         style={{
                             width: 128,
                             height: 193,
-                            backgroundImage: `url(${this.props.coverImageUrl})` }}>
+                            backgroundImage: `url(${thumbnail})` }}>
                     </div>
                     {this.shelfMover()}
                 </div>
-                <div className="book-title">{this.props.title}</div>
-                <div className="book-authors">{this.props.authors}</div>
+                <div className="book-title">{this.props.book.title}</div>
+                <div className="book-authors">{this.listAuthors(this.props.book.authors)}</div>
             </div>
         )
+    }
+
+    /**
+     * @description return div objects populated with the name of each author passed to it
+     * @param { Array } authors - list of authors for a specific book
+     * @return Return a div with the name of each author
+     */
+    listAuthors = (authors) => {
+        if(authors instanceof Array) {
+            return authors.map( (author, index) => {
+                return(
+                    <div key={index}>{author}</div>
+                )
+            })
+        }
     }
 
     /**
@@ -30,7 +46,7 @@ class Book extends Component {
      * @param { event } event - passes the event when there is a change to the select
      */
     onChangeHandler = (event) => {
-        this.props.update(this.props.id, event.target.value);
+        this.props.update(this.props.book, event.target.value);
     }
 
     /**
@@ -38,9 +54,10 @@ class Book extends Component {
      * @return returns select box with shelf options, and onchange updates the shelf of a book
      */
     shelfMover = () => {
+        var shelf = (this.props.book.shelf) ? this.props.book.shelf : 'none';
         return (
             <div className="book-shelf-changer">
-                <select onChange={this.onChangeHandler} value={this.props.shelf}>
+                <select onChange={this.onChangeHandler} value={shelf}>
                     <option value="none" disabled>Move to...</option>
                     {Object.entries(this.props.availableShelves).map(([key, value]) => {
                         return <option key={key} value={key}>{value}</option>

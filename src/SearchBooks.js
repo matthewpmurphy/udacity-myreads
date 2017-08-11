@@ -26,14 +26,27 @@ class SearchBooks extends Component {
      */
     searchBooks = (query) => {
         if(query.length > 0) {
-        BooksAPI.search(query, 20)
-            .then( books => {
-                this.setState({ searchResults: books });
-            });
+            this.setState({ searchResults: [] });
+            BooksAPI.search(encodeURIComponent(query), 20)
+                .then( books => {
+                    this.setState({ searchResults: this.checkForShelf(books) });
+                });
         }
         else {
             this.setState({ searchResults: [] });
         }
+    }
+
+    /**
+     * @description replace book objects that are already on our shelves so we have the correct shelf
+     * @param { Array } books - list of books, presumable returned from the API
+     * @return list of books that now includes the correct shelf for those already on our shelves
+     */
+    checkForShelf = (books) => {
+        return books.map((book) => {
+            var _book = this.props.booksOnShelf.filter( bookOnShelf => bookOnShelf.id === book.id);
+            return (_book.length > 0) ? _book[0] : book;
+        });
     }
 
     /**

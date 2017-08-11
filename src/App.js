@@ -60,15 +60,15 @@ class BooksApp extends Component {
   }
 
   /**
-   * @description Update the shelf of a single book then display a success or failure message
+   * @description Update the shelf of a single book, update the list of books to reflect the change, then display a success or failure message
    * @param { string } id
    * @param { string } shelf
    */
-  updateBookStatus = (id, shelf) => {
-    var book = { id: id };
+  updateBookStatus = (book, shelf) => {
+    book.shelf = shelf;
     BooksAPI.update(book, shelf)
       .then( response => {
-        this.getBooks();
+        this.setState({ books: this.state.books.map((b) => b.id === book.id ? book : b )});
         var message = '';
         if(shelf === 'none') {
           message = 'The book has been removed from your shelves.'
@@ -76,7 +76,6 @@ class BooksApp extends Component {
         else {
           message = 'The book has been moved to the ' + this.state.shelves[shelf] + ' shelf.';
         }
-
         this.notificationStatus(true, message);
       })
       .catch( error => {
@@ -97,11 +96,7 @@ class BooksApp extends Component {
             return (
               <li key={book.id}>
                 <Book
-                  id={book.id}
-                  title={book.title}
-                  authors={this.listAuthors(book.authors)}
-                  coverImageUrl={this.checkForImage(book.imageLinks)}
-                  shelf={book.shelf}
+                  book={book}
                   availableShelves={this.state.shelves}
                   update={this.updateBookStatus}
                 />
@@ -111,20 +106,6 @@ class BooksApp extends Component {
         }
       </ol>
       )
-    }
-  }
-
-  /**
-   * @description Check to see if image object exists
-   * @param { Object } images - image object passed from the book object
-   * @return if images object exists return the thumbnail, if not return not found image
-   */
-  checkForImage = (images) => {
-    if(typeof images !== 'undefined') {
-      return images.thumbnail
-    }
-    else {
-      return '/img/no-image-found.jpg'
     }
   }
 
@@ -148,23 +129,6 @@ class BooksApp extends Component {
   }
 
   /**
-   * @description return div objects populated with the name of each author passed to it
-   * @param { Array } authors - list of authors for a specific book
-   * @return Return a div with the name of each author
-   */
-  listAuthors = (authors) => {
-    if(authors instanceof Array) {
-      return authors.map( (author, index) => {
-        return(
-          <div key={index}>{author}</div>
-        )
-      })
-    }
-
-  }
-
-
-  /**
    * @description When the website loads, setup notifications and get the list of books in your shelves to display
    *
    */
@@ -182,7 +146,7 @@ class BooksApp extends Component {
       <div className="app">
         <NotificationSystem ref="notificationSystem" />
         <Route exact path="/search" render={() => (
-          <SearchBooks update={this.updateBookStatus} listBooks={this.listBooks} />
+          <SearchBooks update={this.updateBookStatus} listBooks={this.listBooks} booksOnShelf={this.state.books} />
         )} />
         <Route exact path="/" render={() => (
           <div className="list-books">
