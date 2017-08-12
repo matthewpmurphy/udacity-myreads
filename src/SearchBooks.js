@@ -27,7 +27,7 @@ class SearchBooks extends Component {
     searchBooks = (query) => {
         if(query.length > 0) {
             this.setState({ searchResults: [] });
-            BooksAPI.search(encodeURIComponent(query), 20)
+            BooksAPI.search(query, 20)
                 .then( books => {
                     this.setState({ searchResults: this.checkForShelf(books) });
                 });
@@ -43,10 +43,12 @@ class SearchBooks extends Component {
      * @return list of books that now includes the correct shelf for those already on our shelves
      */
     checkForShelf = (books) => {
-        return books.map((book) => {
-            var _book = this.props.booksOnShelf.filter( bookOnShelf => bookOnShelf.id === book.id);
-            return (_book.length > 0) ? _book[0] : book;
-        });
+        if(books instanceof Array) {
+            return books.map((book) => {
+                var _book = this.props.booksOnShelf.filter( bookOnShelf => bookOnShelf.id === book.id);
+                return (_book.length > 0) ? _book[0] : book;
+            });
+        }
     }
 
     /**
