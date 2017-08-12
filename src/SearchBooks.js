@@ -9,7 +9,8 @@ class SearchBooks extends Component {
      * @description search results are only need for this component, so setting that state here
      */
     state = {
-        searchResults:[ ]
+        searchResults:[ ],
+        noResultsMessage: ''
     }
 
     /**
@@ -26,7 +27,7 @@ class SearchBooks extends Component {
      */
     searchBooks = (query) => {
         if(query.length > 0) {
-            this.setState({ searchResults: [] });
+            this.setState({ searchResults: [], noResultsMessage: '' });
             BooksAPI.search(query, 20)
                 .then( books => {
                     this.setState({ searchResults: this.checkForShelf(books) });
@@ -65,7 +66,7 @@ class SearchBooks extends Component {
                     </div>
                 </div>
                 <div className="search-books-results">
-                    {this.props.listBooks(this.state.searchResults)}
+                    { (this.state.searchResults instanceof Array) ? this.props.listBooks(this.state.searchResults) : <p className="no-results-found">No Results Found</p>}
                 </div>
             </div>
         )
