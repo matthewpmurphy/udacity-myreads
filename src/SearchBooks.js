@@ -12,6 +12,22 @@ class SearchBooks extends Component {
     }
 
     /**
+     * @description checks for searchResults and query passed as props and determines what to display
+     * @return display search results when the results and a query both exist, display "No results found" if only the query exists, and nothing otherwise
+     */
+    displaySearchResults = () => {
+        if(Array.isArray(this.props.searchResults) && this.props.query.length > 0) {
+            return this.props.display(this.props.searchResults);
+        }
+        else if(this.props.query.length > 0) {
+            return (<p className="no-results-found">No Results Found</p>);
+        }
+        else {
+            return '';
+        }
+    }
+
+    /**
      * @description generate the search screen
      * @return returns the code to generate the search screen, and displays searchResults based on the state of searchResults
      */
@@ -25,7 +41,7 @@ class SearchBooks extends Component {
                     </div>
                 </div>
                 <div className="search-books-results">
-                    { (Array.isArray(this.props.searchResults) && this.props.query.length > 0) ? this.props.display(this.props.searchResults, true) : (this.props.query.length > 0) ? <p className="no-results-found">No Results Found</p> : '' }
+                    {this.displaySearchResults()}
                 </div>
             </div>
         )
