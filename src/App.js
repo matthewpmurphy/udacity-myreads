@@ -12,6 +12,7 @@ class BooksApp extends Component {
   state = {
     books: [],
     searchResults: [],
+    searchQuery: [],
     shelves: {
       currentlyReading: 'Currently Reading',
       wantToRead: 'Want to Read',
@@ -79,13 +80,14 @@ class BooksApp extends Component {
   * @param { string } query - query string to search on
   */
   searchBooks = (query) => {
+    this.setState({
+      searchResults: [],
+      searchQuery: query
+    });
+
     if(query.length > 0) {
-      this.setState({ searchResults: [] });
       BooksAPI.search(query, 20)
         .then( books => this.setState({ searchResults: this.checkForShelf(books) }));
-    }
-    else {
-      this.setState({ searchResults: [] });
     }
   }
 
@@ -168,6 +170,7 @@ class BooksApp extends Component {
             display={this.listBooks}
             searchResults={this.state.searchResults}
             searchBooks={this.searchBooks}
+            query={this.state.searchQuery}
           />
         )} />
         <Route exact path="/" render={() => (

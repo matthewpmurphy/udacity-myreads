@@ -25,7 +25,7 @@ class SearchBooks extends Component {
                     </div>
                 </div>
                 <div className="search-books-results">
-                    { (Array.isArray(this.props.searchResults)) ? this.props.display(this.props.searchResults, true) : <p className="no-results-found">No Results Found</p> }
+                    { (Array.isArray(this.props.searchResults) && this.props.query.length > 0) ? this.props.display(this.props.searchResults, true) : (this.props.query.length > 0) ? <p className="no-results-found">No Results Found</p> : '' }
                 </div>
             </div>
         )
