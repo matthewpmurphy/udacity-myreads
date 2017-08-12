@@ -9,8 +9,7 @@ class SearchBooks extends Component {
      * @description search results are only need for this component, so setting that state here
      */
     state = {
-        searchResults:[ ],
-        noResultsMessage: ''
+        searchResults:[ ]
     }
 
     /**
