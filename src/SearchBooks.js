@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import './App.css'
+import PropTypes from 'prop-types'
 
 class SearchBooks extends Component {
     /**
@@ -25,11 +25,18 @@ class SearchBooks extends Component {
                     </div>
                 </div>
                 <div className="search-books-results">
-                    { (this.props.searchResults instanceof Array) ? this.props.listBooks(this.props.searchResults) : <p className="no-results-found">No Results Found</p>}
+                    { (Array.isArray(this.props.searchResults)) ? this.props.display(this.props.searchResults, true) : <p className="no-results-found">No Results Found</p> }
                 </div>
             </div>
         )
     }
+}
+
+SearchBooks.propTypes = {
+    searchResults: PropTypes.array,
+    searchBooks: PropTypes.func.isRequired,
+    display: PropTypes.func.isRequired,
+    update: PropTypes.func.isRequired
 }
 
 export default SearchBooks

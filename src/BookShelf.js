@@ -1,21 +1,24 @@
-import React, { Component } from 'react'
-import './App.css'
+import React from 'react'
+import PropTypes from 'prop-types'
 
-class BookShelf extends Component {
-    /**
-     * @description Bookshelf component
-     * @return renders the bookshelf component based on the shelf title and books passed to it
-     */
-    render() {
-        return (
-            <div className="bookshelf">
-                <h2 className="bookshelf-title">{this.props.bookShelfTitle}</h2>
-                <div className="bookshelf-books">
-                    {this.props.listBooks(this.props.books)}
-                </div>
-            </div>
-        )
-    }
+/**
+ * @description Bookshelf stateless component
+ * @param { string } bookShelfTitle - title of the bookshelf
+ * @param { books } books - list of books on that bookshelf
+ * @return returns the bookshelf
+*/
+const BookShelf = props =>
+    <div className="bookshelf">
+        <h2 className="bookshelf-title">{props.bookShelfTitle}</h2>
+        <div className="bookshelf-books">
+            {props.display(props.books)}
+        </div>
+    </div>
+
+BookShelf.propTypes = {
+    bookShelfTitle: PropTypes.string.isRequired,
+    display: PropTypes.func.isRequired,
+    books: PropTypes.array
 }
 
 export default BookShelf

@@ -20,7 +20,7 @@ class BooksApp extends Component {
   }
 
   /*
-  *  Notificatino object
+  *  Notification object
   */
   _notifcationSystem: null;
 
@@ -31,8 +31,8 @@ class BooksApp extends Component {
    * @return displays a notification message
    */
   notificationStatus = (success, message) => {
-    var messageLevel = 'error';
-    var title =  'Oops!';
+    let messageLevel = 'error';
+    let title =  'Oops!';
 
     if(success) {
       messageLevel = 'success';
@@ -51,13 +51,9 @@ class BooksApp extends Component {
   /**
    * @description Retrieve all books from api and update the state of books with the results
    */
-  getBooks = () => {
+  getBooksOnShelves = () => {
     BooksAPI.getAll()
-      .then( books => {
-        this.setState({
-          books: books
-        });
-      });
+      .then( books => this.setState({ books: books }));
   }
 
   /**
@@ -69,14 +65,8 @@ class BooksApp extends Component {
     book.shelf = shelf;
     BooksAPI.update(book, shelf)
       .then( response => {
-        this.getBooks();
-        var message = '';
-        if(shelf === 'none') {
-          message = 'The book has been removed from your shelves.'
-        }
-        else {
-          message = 'The book has been moved to the ' + this.state.shelves[shelf] + ' shelf.';
-        }
+        this.getBooksOnShelves();
+        const message = shelf === 'none' ? 'The book has been removed from your shelves.' : `The book has been moved to the ${this.state.shelves[shelf]} shelf`
         this.notificationStatus(true, message);
       })
       .catch( error => {
@@ -85,35 +75,33 @@ class BooksApp extends Component {
   }
 
   /**
-     * @description passes a search query to BooksAPI and updates the state of searchResults
-     * @param { string } query - query string to search on
-     */
-    searchBooks = (query) => {
-        if(query.length > 0) {
-            this.setState({ searchResults: [] });
-            BooksAPI.search(query, 20)
-                .then( books => {
-                    this.setState({ searchResults: this.checkForShelf(books) });
-                });
-        }
-        else {
-            this.setState({ searchResults: [] });
-        }
+  * @description passes a search query to BooksAPI and updates the state of searchResults
+  * @param { string } query - query string to search on
+  */
+  searchBooks = (query) => {
+    if(query.length > 0) {
+      this.setState({ searchResults: [] });
+      BooksAPI.search(query, 20)
+        .then( books => this.setState({ searchResults: this.checkForShelf(books) }));
     }
+    else {
+      this.setState({ searchResults: [] });
+    }
+  }
 
-    /**
-     * @description replace book objects that are already on our shelves so we have the correct shelf
-     * @param { Array } books - list of books, presumable returned from the API
-     * @return list of books that now includes the correct shelf for those already on our shelves
-     */
-    checkForShelf = (books) => {
-        if(books instanceof Array) {
-            return books.map((book) => {
-                var _book = this.state.books.filter( bookOnShelf => bookOnShelf.id === book.id);
-                return (_book.length > 0) ? _book[0] : book;
-            });
-        }
+  /**
+   * @description replace book objects that are already on our shelves so we have the correct shelf
+   * @param { Array } books - list of books, presumable returned from the API
+   * @return list of books that now includes the correct shelf for those already on our shelves
+  */
+  checkForShelf = (books) => {
+    if(Array.isArray(books)) {
+      return books.map((book) => {
+        const _book = this.state.books.find( bookOnShelf => bookOnShelf.id === book.id);
+        return (!!_book) ? _book : book;
+      });
     }
+  }
 
   /**
    * @description Take an array of books, maps them into an ordered list of book components and returns the list
@@ -121,11 +109,10 @@ class BooksApp extends Component {
    * @return an ordered list of book components
    */
   listBooks = (books) => {
-    if(books instanceof Array) {
+    if(Array.isArray(books)) {
       return (
         <ol className="books-grid">
-          {books.map( book => {
-            return (
+          {books.map( book => (
               <li key={book.id}>
                 <Book
                   book={book}
@@ -133,8 +120,7 @@ class BooksApp extends Component {
                   update={this.updateBookStatus}
                 />
               </li>
-            )
-          })
+          ))
         }
       </ol>
       )
@@ -152,9 +138,8 @@ class BooksApp extends Component {
           <BookShelf
             key={key}
             bookShelfTitle={value}
-            listBooks={this.listBooks}
+            display={this.listBooks}
             books={this.state.books.filter(books => books.shelf === key)}
-            updateBookStatus={this.updateBookStatus}
           />
         )
       }));
@@ -166,7 +151,7 @@ class BooksApp extends Component {
    */
   componentDidMount() {
     this._notificationSystem = this.refs.notificationSystem;
-    this.getBooks();
+    this.getBooksOnShelves();
   }
 
   /**
@@ -180,7 +165,7 @@ class BooksApp extends Component {
         <Route exact path="/search" render={() => (
           <SearchBooks
             update={this.updateBookStatus}
-            listBooks={this.listBooks}
+            display={this.listBooks}
             searchResults={this.state.searchResults}
             searchBooks={this.searchBooks}
           />

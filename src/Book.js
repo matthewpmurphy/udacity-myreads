@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
-import './App.css'
+import PropTypes from 'prop-types'
+
 class Book extends Component {
 
     /**
@@ -7,7 +8,6 @@ class Book extends Component {
      * @return returns the setup for a book based on properties passed into it
      */
     render() {
-        var thumbnail = (this.props.book.imageLinks) ? this.props.book.imageLinks.thumbnail : '/img/no-image-found.jpg';
         return (
             <div className="book">
                 <div className="book-top">
@@ -16,7 +16,8 @@ class Book extends Component {
                         style={{
                             width: 128,
                             height: 193,
-                            backgroundImage: `url(${thumbnail})` }}>
+                            backgroundImage: `url(${(this.props.book.imageLinks) ? this.props.book.imageLinks.thumbnail : '/img/no-image-found.jpg'})`
+                        }}>
                     </div>
                     {this.shelfMover()}
                 </div>
@@ -32,13 +33,7 @@ class Book extends Component {
      * @return Return a div with the name of each author
      */
     listAuthors = (authors) => {
-        if(authors instanceof Array) {
-            return authors.map( (author, index) => {
-                return(
-                    <div key={index}>{author}</div>
-                )
-            })
-        }
+        return !!authors ? authors.join(', ') : '';
     }
 
     /**
@@ -54,10 +49,9 @@ class Book extends Component {
      * @return returns select box with shelf options, and onchange updates the shelf of a book
      */
     shelfMover = () => {
-        var shelf = (this.props.book.shelf) ? this.props.book.shelf : 'none';
         return (
             <div className="book-shelf-changer">
-                <select onChange={this.onChangeHandler} value={shelf}>
+                <select onChange={this.onChangeHandler} value={(this.props.book.shelf) ? this.props.book.shelf : 'none'}>
                     <option value="none" disabled>Move to...</option>
                     {Object.entries(this.props.availableShelves).map(([key, value]) => {
                         return <option key={key} value={key}>{value}</option>
@@ -67,6 +61,12 @@ class Book extends Component {
             </div>
         )
     }
+}
+
+Book.propTypes = {
+    book: PropTypes.object.isRequired,
+    update: PropTypes.func.isRequired,
+    availableShelves: PropTypes.object.isRequired
 }
 
 export default Book
