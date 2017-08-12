@@ -11,6 +11,7 @@ class BooksApp extends Component {
   //Track state for books in our shelves as well as the books in our serach results
   state = {
     books: [],
+    searchResults: [],
     shelves: {
       currentlyReading: 'Currently Reading',
       wantToRead: 'Want to Read',
@@ -68,7 +69,7 @@ class BooksApp extends Component {
     book.shelf = shelf;
     BooksAPI.update(book, shelf)
       .then( response => {
-        this.setState({ books: this.state.books.map((b) => b.id === book.id ? book : b )});
+        this.getBooks();
         var message = '';
         if(shelf === 'none') {
           message = 'The book has been removed from your shelves.'
@@ -82,6 +83,37 @@ class BooksApp extends Component {
         this.notificationStatus(false, JSON.stringify(error));
       });
   }
+
+  /**
+     * @description passes a search query to BooksAPI and updates the state of searchResults
+     * @param { string } query - query string to search on
+     */
+    searchBooks = (query) => {
+        if(query.length > 0) {
+            this.setState({ searchResults: [] });
+            BooksAPI.search(query, 20)
+                .then( books => {
+                    this.setState({ searchResults: this.checkForShelf(books) });
+                });
+        }
+        else {
+            this.setState({ searchResults: [] });
+        }
+    }
+
+    /**
+     * @description replace book objects that are already on our shelves so we have the correct shelf
+     * @param { Array } books - list of books, presumable returned from the API
+     * @return list of books that now includes the correct shelf for those already on our shelves
+     */
+    checkForShelf = (books) => {
+        if(books instanceof Array) {
+            return books.map((book) => {
+                var _book = this.state.books.filter( bookOnShelf => bookOnShelf.id === book.id);
+                return (_book.length > 0) ? _book[0] : book;
+            });
+        }
+    }
 
   /**
    * @description Take an array of books, maps them into an ordered list of book components and returns the list
@@ -146,7 +178,12 @@ class BooksApp extends Component {
       <div className="app">
         <NotificationSystem ref="notificationSystem" />
         <Route exact path="/search" render={() => (
-          <SearchBooks update={this.updateBookStatus} listBooks={this.listBooks} booksOnShelf={this.state.books} />
+          <SearchBooks
+            update={this.updateBookStatus}
+            listBooks={this.listBooks}
+            searchResults={this.state.searchResults}
+            searchBooks={this.searchBooks}
+          />
         )} />
         <Route exact path="/" render={() => (
           <div className="list-books">

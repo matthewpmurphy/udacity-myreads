@@ -1,54 +1,14 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
-import * as BooksAPI from './BooksAPI'
 import './App.css'
 
 class SearchBooks extends Component {
-
-    /**
-     * @description search results are only need for this component, so setting that state here
-     */
-    state = {
-        searchResults:[]
-    }
-
     /**
      * @description as someone types, this will execute the searchBooks function
      * @param { event } event - tracks events to the search text box
      */
     handleChange = (event) => {
-        this.searchBooks(event.target.value);
-    }
-
-    /**
-     * @description passes a search query to BooksAPI and updates the state of searchResults
-     * @param { string } query - query string to search on
-     */
-    searchBooks = (query) => {
-        if(query.length > 0) {
-            this.setState({ searchResults: [], noResultsMessage: '' });
-            BooksAPI.search(query, 20)
-                .then( books => {
-                    this.setState({ searchResults: this.checkForShelf(books) });
-                });
-        }
-        else {
-            this.setState({ searchResults: [] });
-        }
-    }
-
-    /**
-     * @description replace book objects that are already on our shelves so we have the correct shelf
-     * @param { Array } books - list of books, presumable returned from the API
-     * @return list of books that now includes the correct shelf for those already on our shelves
-     */
-    checkForShelf = (books) => {
-        if(books instanceof Array) {
-            return books.map((book) => {
-                var _book = this.props.booksOnShelf.filter( bookOnShelf => bookOnShelf.id === book.id);
-                return (_book.length > 0) ? _book[0] : book;
-            });
-        }
+        this.props.searchBooks(event.target.value);
     }
 
     /**
@@ -65,7 +25,7 @@ class SearchBooks extends Component {
                     </div>
                 </div>
                 <div className="search-books-results">
-                    { (this.state.searchResults instanceof Array) ? this.props.listBooks(this.state.searchResults) : <p className="no-results-found">No Results Found</p>}
+                    { (this.props.searchResults instanceof Array) ? this.props.listBooks(this.props.searchResults) : <p className="no-results-found">No Results Found</p>}
                 </div>
             </div>
         )
